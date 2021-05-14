@@ -1,5 +1,7 @@
+use crate::{compose, compose_nodes};
 use crate::composite::{Composite, NextNode, Node};
 use crate::nest::NestLevel;
+
 trait IntOp {
     fn execute(&self, input: usize) -> usize;
 }
@@ -72,14 +74,9 @@ impl<Nodes: NextNode + IntOpAtLevel + NestLevel> Composite<Nodes> {
     }
 }
 
-#[cfg(test)]
-mod test {
-    #[macro_use]
-    use crate::{compose, compose_nodes};
-    use super::{Adder, Composite, IntOpAtLevel, NestLevel, Node};
-    fn can_compose() {
-        let composite = compose!(Adder::<11>::new(), Adder::<12>::new(), Adder::<13>::new());
-        let outputs: Vec<usize> = composite.iter_execute(0).collect();
-        assert_eq!(outputs, vec![11, 12, 13]);
-    }
+#[test]
+fn can_compose() {
+    let composite = compose!(Adder::<11>::new(), Adder::<12>::new(), Adder::<13>::new());
+    let outputs: Vec<usize> = composite.iter_execute(0).collect();
+    assert_eq!(outputs, vec![11, 12, 13]);
 }

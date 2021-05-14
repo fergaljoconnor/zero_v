@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Composite<A: NextNode> {
     pub head: A,
 }
@@ -9,7 +9,7 @@ impl<A: NextNode> Composite<A> {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct Node<A, B: NextNode> {
     pub data: A,
     pub next: B,
@@ -52,9 +52,17 @@ macro_rules! compose {
     };
 }
 
-
-#[test]
-fn output() {
-    let composed = compose!();
-    println!("{:?}", composed);
+#[cfg(test)]
+mod test {
+    use super::{Composite, Node};
+    #[test]
+    fn output() {
+        assert_eq!(compose!(), Composite::new(()));
+        assert_eq!(compose!(0), Composite::new(Node::base(0)));
+        assert_eq!(compose!(0, 1), Composite::new(Node::new(0, Node::base(1))));
+        assert_eq!(
+            compose!(0, 1, 2),
+            Composite::new(Node::new(0, Node::new(1, Node::base(2))))
+        );
+    }
 }

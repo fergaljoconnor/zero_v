@@ -4,6 +4,7 @@ pub trait NestLevel {
 }
 
 impl NestLevel for () {
+    #[inline]
     fn nest_level(&self) -> usize {
         0
     }
