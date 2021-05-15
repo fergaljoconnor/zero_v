@@ -63,16 +63,121 @@ impl<'a, Nodes: NextNode + IntOpAtLevel> Iterator for CompositeIterator<'a, Node
     }
 }
 
-struct Adder<const VALUE: usize> {}
+struct Adder {
+    value: usize,
+}
 
-impl<const VALUE: usize> Adder<VALUE> {
+impl Adder {
+    fn new(value: usize) -> Self {
+        Self { value }
+    }
+}
+
+impl IntOp for Adder {
+    fn execute(&self, input: usize) -> usize {
+        input + self.value
+    }
+}
+
+struct Multiplier {
+    value: usize,
+}
+
+impl Multiplier {
+    fn new(value: usize) -> Self {
+        Self { value }
+    }
+}
+
+impl IntOp for Multiplier {
+    fn execute(&self, input: usize) -> usize {
+        input * self.value
+    }
+}
+
+struct RShifter {
+    value: usize,
+}
+
+impl RShifter {
+    fn new(value: usize) -> Self {
+        Self { value }
+    }
+}
+
+impl IntOp for RShifter {
+    fn execute(&self, input: usize) -> usize {
+        input >> self.value
+    }
+}
+
+struct LShifter {
+    value: usize,
+}
+
+impl LShifter {
+    fn new(value: usize) -> Self {
+        Self { value }
+    }
+}
+
+impl IntOp for LShifter {
+    fn execute(&self, input: usize) -> usize {
+        input << self.value
+    }
+}
+
+struct ConstAdder<const VALUE: usize> {}
+
+impl<const VALUE: usize> ConstAdder<VALUE> {
     fn new() -> Self {
         Self {}
     }
 }
 
-impl<const VALUE: usize> IntOp for Adder<VALUE> {
-    #[inline]
+impl<const VALUE: usize> IntOp for ConstAdder<VALUE> {
+    fn execute(&self, input: usize) -> usize {
+        input + VALUE
+    }
+}
+
+struct ConstMultiplier<const VALUE: usize> {}
+
+impl<const VALUE: usize> ConstMultiplier<VALUE> {
+    fn new() -> Self {
+        Self {}
+    }
+}
+
+impl<const VALUE: usize> IntOp for ConstMultiplier<VALUE> {
+    fn execute(&self, input: usize) -> usize {
+        input * VALUE
+    }
+}
+
+struct ConstRShifter<const VALUE: usize> {}
+
+impl<const VALUE: usize> ConstRShifter<VALUE> {
+    fn new() -> Self {
+        Self {}
+    }
+}
+
+impl<const VALUE: usize> IntOp for ConstRShifter<VALUE> {
+    fn execute(&self, input: usize) -> usize {
+        input >> VALUE
+    }
+}
+
+struct ConstLShifter<const VALUE: usize> {}
+
+impl<const VALUE: usize> ConstLShifter<VALUE> {
+    fn new() -> Self {
+        Self {}
+    }
+}
+
+impl<const VALUE: usize> IntOp for ConstLShifter<VALUE> {
     fn execute(&self, input: usize) -> usize {
         input >> VALUE
     }
@@ -93,43 +198,85 @@ fn bench_trait_objects(input: usize, ops: &Vec<Box<dyn IntOp>>) -> usize {
 pub fn criterion_benchmark(c: &mut Criterion) {
     let mut group = c.benchmark_group("Adders");
 
-    let adders_dyn: Vec<Box<dyn IntOp>> = vec![
-        Box::new(Adder::<0>::new()),
-        Box::new(Adder::<1>::new()),
-        Box::new(Adder::<2>::new()),
-        Box::new(Adder::<3>::new()),
-        Box::new(Adder::<4>::new()),
-        Box::new(Adder::<5>::new()),
-        Box::new(Adder::<6>::new()),
-        Box::new(Adder::<7>::new()),
-        Box::new(Adder::<8>::new()),
-        Box::new(Adder::<9>::new()),
-        Box::new(Adder::<10>::new()),
-        Box::new(Adder::<11>::new()),
-        Box::new(Adder::<12>::new()),
-        Box::new(Adder::<13>::new()),
+    let ops_dyn: Vec<Box<dyn IntOp>> = vec![
+        Box::new(Adder::new(0)),
+        Box::new(LShifter::new(1)),
+        Box::new(Adder::new(2)),
+        Box::new(Multiplier::new(3)),
+        Box::new(Adder::new(4)),
+        Box::new(Multiplier::new(5)),
+        Box::new(Adder::new(6)),
+        Box::new(Multiplier::new(7)),
+        Box::new(Adder::new(8)),
+        Box::new(Multiplier::new(9)),
+        Box::new(Adder::new(10)),
+        Box::new(RShifter::new(11)),
+        Box::new(Adder::new(12)),
+        Box::new(RShifter::new(13)),
     ];
 
-    let adders = compose!(
-        Adder::<0>::new(),
-        Adder::<1>::new(),
-        Adder::<2>::new(),
-        Adder::<3>::new(),
-        Adder::<4>::new(),
-        Adder::<5>::new(),
-        Adder::<6>::new(),
-        Adder::<7>::new(),
-        Adder::<8>::new(),
-        Adder::<9>::new(),
-        Adder::<10>::new(),
-        Adder::<11>::new(),
-        Adder::<12>::new(),
-        Adder::<13>::new()
+    let ops_dyn_const: Vec<Box<dyn IntOp>> = vec![
+        Box::new(ConstAdder::<0>::new()),
+        Box::new(ConstLShifter::<1>::new()),
+        Box::new(ConstAdder::<2>::new()),
+        Box::new(ConstMultiplier::<3>::new()),
+        Box::new(ConstAdder::<4>::new()),
+        Box::new(ConstMultiplier::<5>::new()),
+        Box::new(ConstAdder::<6>::new()),
+        Box::new(ConstMultiplier::<7>::new()),
+        Box::new(ConstAdder::<8>::new()),
+        Box::new(ConstMultiplier::<9>::new()),
+        Box::new(ConstAdder::<10>::new()),
+        Box::new(ConstRShifter::<11>::new()),
+        Box::new(ConstAdder::<12>::new()),
+        Box::new(ConstRShifter::<13>::new()),
+    ];
+
+    let ops = compose!(
+        Adder::new(0),
+        LShifter::new(1),
+        Adder::new(2),
+        Multiplier::new(3),
+        Adder::new(4),
+        Multiplier::new(5),
+        Adder::new(6),
+        Multiplier::new(7),
+        Adder::new(8),
+        Multiplier::new(9),
+        Adder::new(10),
+        RShifter::new(11),
+        Adder::new(12),
+        RShifter::new(13)
     );
 
-    group.bench_function("static", |b| b.iter(|| bench_composed(black_box(20), &adders)));
-    group.bench_function("dynamic", |b| {
-        b.iter(|| bench_trait_objects(black_box(20), &adders_dyn))
+    let ops_const = compose!(
+        ConstAdder::<0>::new(),
+        ConstLShifter::<1>::new(),
+        ConstAdder::<2>::new(),
+        ConstMultiplier::<3>::new(),
+        ConstAdder::<4>::new(),
+        ConstMultiplier::<5>::new(),
+        ConstAdder::<6>::new(),
+        ConstMultiplier::<7>::new(),
+        ConstAdder::<8>::new(),
+        ConstMultiplier::<9>::new(),
+        ConstAdder::<10>::new(),
+        ConstRShifter::<11>::new(),
+        ConstAdder::<12>::new(),
+        ConstRShifter::<13>::new()
+    );
+
+    group.bench_function("static dispatch/arg", |b| {
+        b.iter(|| bench_composed(black_box(20), black_box(&ops)))
+    });
+    group.bench_function("dynamic dispatch/arg", |b| {
+        b.iter(|| bench_trait_objects(black_box(20), black_box(&ops_dyn)))
+    });
+    group.bench_function("static dispatch/const", |b| {
+        b.iter(|| bench_composed(black_box(20), black_box(&ops_const)))
+    });
+    group.bench_function("dynamic dispatch/const", |b| {
+        b.iter(|| bench_trait_objects(black_box(20), black_box(&ops_dyn_const)))
     });
 }
 
