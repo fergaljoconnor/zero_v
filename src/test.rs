@@ -68,10 +68,14 @@ impl<'a, Nodes: NextNode + IntOpAtLevel> Iterator for CompositeIterator<'a, Node
     }
 }
 
-impl<Nodes: NextNode + IntOpAtLevel + NestLevel> Composite<Nodes> {
-    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes> {
-        CompositeIterator::new(&self.head, input, self.head.nest_level())
-    }
+trait IterExecute<Nodes: NextNode + IntOpAtLevel + NestLevel> {
+   fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes>;
+}
+
+impl<Nodes: NextNode + IntOpAtLevel + NestLevel>IterExecute<Nodes> for Composite<Nodes> {
+   fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes> {
+       CompositeIterator::new(&self.head, input, self.head.nest_level())
+   }
 }
 
 #[test]
