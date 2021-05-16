@@ -52,7 +52,7 @@
 //!compiler to monomorphise the plugin use and remove the virtual
 //!function calls.
 //!
-//!## Implementing Zero_v for your type
+//!##Implementing Zero_v for your type
 //!
 //! To enable zero_v, you'll need to add a pretty large chunk of boilerplate
 //! to your library. This code walks you through it step by step
@@ -148,6 +148,9 @@
 //!    }
 //!}
 //!```
+//!
+//!##Benchmarks
+//!![alt text](https://raw.githubusercontent.com/fergaljoconnor/zero_v/main/blob/Zero_V_Benchmarks.png)
 
 mod composite;
 mod nest;

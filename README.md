@@ -53,7 +53,7 @@ a type defined without the use of boxing or vtables, which encourages the
 compiler to monomorphise the plugin use and remove the virtual
 function calls.
 
-### Implementing Zero_v for your type
+###Implementing Zero_v for your type
 
 To enable zero_v, you'll need to add a pretty large chunk of boilerplate
 to your library. This code walks you through it step by step
@@ -149,3 +149,6 @@ impl<Nodes: NextNode + IntOpAtLevel + NestLevel>IterExecute<Nodes> for Composite
    }
 }
 ```
+
+###Benchmarks
+![alt text](https://raw.githubusercontent.com/fergaljoconnor/zero_v/main/blob/Zero_V_Benchmarks.png)
