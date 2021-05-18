@@ -1,16 +1,19 @@
 # zero_v
 
-Zero_v is an experiment in defining behavior over a collections of
+Zero_V is an experiment in defining behavior over collections of
 objects implementing some trait without dynamic polymorphism.
+This is a very small crate with a few helper utilities, but it's more of a
+technique than a framework and if you want to implement it for your library
+it will take a decent amount of DIY and boilerplate.
 
-It can be used in contexts where:
+It can be useful if all of the following are true:
 * Library users will always know the composition of the collection of types at compile time.
 * Library users should be able to alter collection composition easily.
 * You're okay with adding a significant chunk of boilerplate to your library internals.
 * Vtable overhead matters
 
 For example, lets imagine you've written an event logging library that
-allows users to extend it with plugins that alter the event before logging.
+allows users to extend it with plugins to alter events before logging.
 Using dynamic polymorphism/ vtables, client code might look something like:
 
 ```rust
@@ -29,7 +32,7 @@ This is a fine way to approach the problem in most cases. It's easy for
 clients to set up and you rarely care about the overhead of the virtual
 calls.
 
-But if you do care about overhead, a zero_v version of the above looks
+But if you do care about overhead, a Zero_V version of the above looks
 like:
 
 ```rust
@@ -48,14 +51,14 @@ for event in events.listen() {logger.log_event(event)};
 
 To the client the only real difference here is the use of the compose macro,
 dropping the boxing for each plugin in the collection
-and the extra zero_v imports. But internally, your type is now generic over
+and the extra Zero_V imports. But internally, your type is now generic over
 a type defined without the use of boxing or vtables, which encourages the
 compiler to monomorphise the plugin use and remove the virtual
 function calls.
 
-## Implementing Zero_v for your type
+## Implementing Zero_V for your type
 
-To enable zero_v, you'll need to add a pretty large chunk of boilerplate
+To enable Zero_V, you'll need to add a pretty large chunk of boilerplate
 to your library. This code walks you through it step by step
 for a simple example.
 
@@ -159,7 +162,7 @@ Vtable way) and one static collection (using Zero_V) for each of those sets.
 Results are given below (Hardware was a Lenovo T430 and benchmarks were
 compiled using rustc 1.52.1, so your mileage may vary)
 ![alt text](https://raw.githubusercontent.com/fergaljoconnor/zero_v/main/blob/Zero_V_Benchmarks.png)
-Zero_v comes out of this benchmark looking pretty good, but I do want to
+Zero_V comes out of this benchmark looking pretty good, but I do want to
 stress the following caveats.
 * This was using a trait where each iteration of the loop did a very small
 amount of work (a single multiplication, addition, rshift or lshift op).
