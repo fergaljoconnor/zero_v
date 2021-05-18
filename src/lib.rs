@@ -22,7 +22,7 @@
 //!let mut logger = EventLogger::with_plugins(plugins);
 //!
 //!let events = EventStream::new();
-//!for event in events.listen() {logger.log_event()};
+//!for event in events.listen() {logger.log_event(event)};
 //!```
 //!This is a fine way to approach the problem in most cases. It's easy for
 //!clients to set up and you rarely care about the overhead of the virtual
@@ -42,7 +42,7 @@
 //!let mut logger = EventLogger::with_plugins(plugins);
 //!
 //!let events = EventStream::new();
-//!for event in events.listen() {logger.log_event()};/
+//!for event in events.listen() {logger.log_event(event)};
 //!```
 //!
 //!To the client the only real difference here is the use of the compose macro,
@@ -119,7 +119,7 @@
 //!
 //!// You'll need to implement Iterator for the iterator you just defined.
 //!// The item type will be the return type of your function. For next, just
-//!// copy the body of next below, replacing execute_at_level with the 
+//!// copy the body of next below, replacing execute_at_level with the
 //!// signature of your execute_at_level function.
 //!impl<'a, Nodes: NextNode + IntOpAtLevel> Iterator for CompositeIterator<'a, Nodes> {
 //!    type Item = usize;
@@ -134,7 +134,7 @@
 //!}
 //!
 //!// Almost done. Now you'll need to define a trait returning your iterator
-//!// type. 
+//!// type.
 //!trait IterExecute<Nodes: NextNode + IntOpAtLevel + NestLevel> {
 //!    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes>;
 //!}
@@ -157,5 +157,5 @@ mod nest;
 #[cfg(test)]
 mod test;
 
-pub use composite::{Composite, Node, NextNode};
+pub use composite::{Composite, NextNode, Node};
 pub use nest::NestLevel;

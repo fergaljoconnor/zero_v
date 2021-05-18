@@ -23,7 +23,7 @@ let plugins: Vec<Box<dyn Plugin>> = Vec![
 let mut logger = EventLogger::with_plugins(plugins);
 
 let events = EventStream::new();
-for event in events.listen() {logger.log_event()};
+for event in events.listen() {logger.log_event(event)};
 ```
 This is a fine way to approach the problem in most cases. It's easy for
 clients to set up and you rarely care about the overhead of the virtual
@@ -43,7 +43,7 @@ let plugins = compose!(
 let mut logger = EventLogger::with_plugins(plugins);
 
 let events = EventStream::new();
-for event in events.listen() {logger.log_event()};/
+for event in events.listen() {logger.log_event(event)};
 ```
 
 To the client the only real difference here is the use of the compose macro,
