@@ -156,7 +156,7 @@ sets of objects implementing a simple trait transforming a usize to another usiz
 (one taking a constructor argument and one using a small extra const optimization),
 and then implements the benchmark with one dynamic collection (the standard
 Vtable way) and one static collection (using Zero_V) for each of those sets.
-Results are given below (Hardware was a Lenovo T430  benchmarks were
+Results are given below (Hardware was a Lenovo T430 and benchmarks were
 compiled using rustc 1.52.1, so your mileage may vary)
 ![alt text](https://raw.githubusercontent.com/fergaljoconnor/zero_v/main/blob/Zero_V_Benchmarks.png)
 Zero_v comes out of this benchmark looking pretty good, but I do want to
@@ -166,7 +166,7 @@ amount of work (a single multiplication, addition, rshift or lshift op).
 Basically this means that these benchmarks should make Zero_V look as good
 as it will ever look, since the Vtable overhead will be as large as possible
 relative to the amount of work per iteration.
-*Every use case is different, every machine is different and compilers can be
+* Every use case is different, every machine is different and compilers can be
 fickle. If performance is important enough to pay the structural costs this
 technique  will impose on your code, it's probably important enough to verify
 you're getting the expected speedups by running your own benchmark suite.
