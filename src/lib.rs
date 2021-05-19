@@ -9,7 +9,7 @@
 //! * Library users will always know the composition of the collection of types at compile time.
 //! * Library users should be able to alter collection composition easily.
 //! * You're okay with adding a significant chunk of boilerplate to your library internals.
-//! * Vtable overhead matters
+//! * vtable overhead matters
 //!
 //!For example, lets imagine you've written an event logging library that
 //!allows users to extend it with plugins to alter events before logging.
@@ -157,7 +157,7 @@
 //!sets of objects implementing a simple trait transforming a usize to another usize,
 //!(one taking a constructor argument and one using a small extra const optimization),
 //!and then implements the benchmark with one dynamic collection (the standard
-//!Vtable way) and one static collection (using Zero_V) for each of those sets.
+//!vtable way) and one static collection (using Zero_V) for each of those sets.
 //!Results are given below (Hardware was a Lenovo T430 and benchmarks were
 //!compiled using rustc 1.52.1, so your mileage may vary)
 //!![alt text](https://raw.githubusercontent.com/fergaljoconnor/zero_v/main/blob/Zero_V_Benchmarks.png)
@@ -166,7 +166,7 @@
 //!* This was using a trait where each iteration of the loop did a very small
 //!amount of work (a single multiplication, addition, rshift or lshift op).
 //!Basically this means that these benchmarks should make Zero_V look as good
-//!as it will ever look, since the Vtable overhead will be as large as possible
+//!as it will ever look, since the vtable overhead will be as large as possible
 //!relative to the amount of work per iteration.
 //!* Every use case is different, every machine is different and compilers can be
 //!fickle. If performance is important enough to pay the structural costs this
