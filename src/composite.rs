@@ -1,24 +1,25 @@
-// The current structure of the composite system can be understood as being
-// similar to a linked list but which each node containing a type instead
-// of an object. So effectively, we build a list of types at compile
-// time, terminating with the unit type, and use that list to build a nested
-// data structure where each level of nesting is responsible for one of the
-// types in that list (the most deeply nested level only containing the unit
-// type).
-//
-// To understand how this is handy,lets go through the usage path, from here
-// to the application writer.
-//
-// 1. The zero_v library: uses this to define a level of nesting associated
-//    with each object in the structure.
-// 2. The intermediate library: Uses the nesting level and recursion to define an
-//    iterator/ some other output over any collection of objects implementing
-//    their trait which executes one or more functions on each object at each
-//    level and combines the outputs in some way.
-// 3. The application author: Defines the specific collection of objects at
-//    compile time and uses the behavior defined by the intermediate library
-//    to get some result or to plug that collection into some type exposed
-//    by the intermediate library.
+/*
+The current structure of the composite system is
+similar to a linked list but which each node containing a type instead
+of an object. So effectively, we build a list of types at compile
+time, terminating with the unit type, and use that list to build a nested
+data structure where each level of nesting is responsible for one of the
+types in that list (the most deeply nested level only containing the unit
+type).
+
+To understand how this is handy,lets go through the usage path, from here
+to the application writer.
+
+1. The zero_v library: Uses this to define generic collections of objects.
+2. The intermediate library: Uses the nesting level and recursion to define an
+   iterator/ some other output over any collection of objects implementing
+   their trait which executes one or more functions on each object at each
+   level and combines the outputs in some way.
+3. The application author: Defines the specific collection of objects at
+   compile time and uses the behavior defined by the intermediate library
+   to get some result or to plug that collection into some type exposed
+   by the intermediate library.
+*/
 
 /// A type representing a collection of zero or more objects.
 #[derive(Debug, PartialEq)]
