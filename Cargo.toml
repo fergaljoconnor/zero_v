@@ -15,5 +15,5 @@ exclude = [
 criterion = "0.3"
 
 [[bench]]
-name = "my_benchmark"
+name = "integer_ops"
 harness = false

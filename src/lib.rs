@@ -164,14 +164,28 @@
 //!Zero_V comes out of this benchmark looking pretty good, but I do want to
 //!stress the following caveats.
 //!* This was using a trait where each iteration of the loop did a very small
-//!amount of work (a single multiplication, addition, rshift or lshift op).
-//!Basically this means that these benchmarks should make Zero_V look as good
-//!as it will ever look, since the vtable overhead will be as large as possible
-//!relative to the amount of work per iteration.
+//!  amount of work (a single multiplication, addition, rshift or lshift op).
+//!  Basically this means that these benchmarks should make Zero_V look as good
+//!  as it will ever look, since the vtable overhead will be as large as possible
+//!  relative to the amount of work per iteration.
 //!* Every use case is different, every machine is different and compilers can be
-//!fickle. If performance is important enough to pay the structural costs this
-//!technique  will impose on your code, it's probably important enough to verify
-//!you're getting the expected speedups by running your own benchmark suite.
+//!  fickle. If performance is important enough to pay the structural costs this
+//!  technique  will impose on your code, it's probably important enough to verify
+//!  you're getting the expected speedups by running your own benchmark suite,
+//!  and making sure those benchmarks are reflected in production. The
+//!  benchmarks above also make aggressive use of inline annotations
+//!  for trait implementations, and removing a single annotation can 
+//!  make the execution three times slower, so it's probably worth exploring
+//!  inlining for your own use case dependent on your performance needs.
+//!* The eagle-eyed amongst you might notice there's a fifth benchmark, baseline,
+//!  that completes in a little over a nanosecond. This is the version of the 
+//!  benchmarks that dispenses with traits and objects and just has a single function
+//!  which performs the work we're doing in the other benchmarks (execute
+//!  a set of integer ops on our input and sum the outputs). Depending
+//!  on your use case, it's usually a good idea to design your APIs in such
+//!  a way that if someone wants to hardcode a highly optimized solution like
+//!  that, they have the tools to do so. If you're good to your compiler, your
+//!  compiler will be good to you (occasional compiler bugs notwithstanding).
 
 mod composite;
 mod nest;

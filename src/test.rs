@@ -1,6 +1,5 @@
 use crate::{compose, compose_nodes};
 use crate::composite::{Composite, NextNode, Node};
-use crate::nest::NestLevel;
 
 trait IntOp {
     fn execute(&self, input: usize) -> usize;
@@ -24,12 +23,12 @@ trait IntOpAtLevel {
     fn execute_at_level(&self, input: usize, level: usize) -> Option<usize>;
 }
 
-impl<A: IntOp, B: NextNode + IntOpAtLevel + NestLevel> IntOpAtLevel for Node<A, B> {
+impl<A: IntOp, B: NextNode + IntOpAtLevel> IntOpAtLevel for Node<A, B> {
     fn execute_at_level(&self, input: usize, level: usize) -> Option<usize> {
-        if level == self.nest_level() {
+        if level == 0 {
             Some(self.data.execute(input))
         } else {
-            self.next.execute_at_level(input, level)
+            self.next.execute_at_level(input, level - 1)
         }
     }
 }
@@ -47,11 +46,11 @@ struct CompositeIterator<'a, Nodes: NextNode + IntOpAtLevel> {
 }
 
 impl<'a, Nodes: NextNode + IntOpAtLevel> CompositeIterator<'a, Nodes> {
-    fn new(parent: &'a Nodes, input: usize, max_level: usize) -> Self {
+    fn new(parent: &'a Nodes, input: usize) -> Self {
         Self {
             parent,
             input,
-            level: max_level,
+            level: 0,
         }
     }
 }
@@ -61,20 +60,18 @@ impl<'a, Nodes: NextNode + IntOpAtLevel> Iterator for CompositeIterator<'a, Node
 
     fn next(&mut self) -> Option<Self::Item> {
         let result = self.parent.execute_at_level(self.input, self.level);
-        if self.level > 0 {
-            self.level -= 1
-        };
+        self.level += 1;
         result
     }
 }
 
-trait IterExecute<Nodes: NextNode + IntOpAtLevel + NestLevel> {
+trait IterExecute<Nodes: NextNode + IntOpAtLevel> {
    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes>;
 }
 
-impl<Nodes: NextNode + IntOpAtLevel + NestLevel>IterExecute<Nodes> for Composite<Nodes> {
+impl<Nodes: NextNode + IntOpAtLevel> IterExecute<Nodes> for Composite<Nodes> {
    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes> {
-       CompositeIterator::new(&self.head, input, self.head.nest_level())
+       CompositeIterator::new(&self.head, input)
    }
 }
 

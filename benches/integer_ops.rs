@@ -1,37 +1,43 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use zero_v::{compose, compose_nodes, Composite, NestLevel, NextNode, Node};
+use zero_v::{compose, compose_nodes, Composite, NextNode, Node};
 
+// The trait we want members of our collection to implement
 trait IntOp {
     fn execute(&self, input: usize) -> usize;
 }
 
+// Execute the trait's function on the object at a certain nesting level
 trait IntOpAtLevel {
     fn execute_at_level(&self, input: usize, level: usize) -> Option<usize>;
 }
 
-trait IterIntOps<NodeType: NextNode + IntOpAtLevel> {
-    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, NodeType>;
-}
-
 impl IntOpAtLevel for () {
+    #[inline]
     fn execute_at_level(&self, _input: usize, _level: usize) -> Option<usize> {
         None
     }
 }
 
-impl<A: IntOp, B: NextNode + IntOpAtLevel + NestLevel> IntOpAtLevel for Node<A, B> {
+impl<A: IntOp, B: NextNode + IntOpAtLevel> IntOpAtLevel for Node<A, B> {
+    #[inline]
     fn execute_at_level(&self, input: usize, level: usize) -> Option<usize> {
-        if level == self.nest_level() {
-            Some(self.data.execute(input))
+        if level != 0 {
+            self.next.execute_at_level(input, level - 1)
         } else {
-            self.next.execute_at_level(input, level)
+            Some(self.data.execute(input))
         }
     }
 }
 
-impl<Nodes: NextNode + IntOpAtLevel + NestLevel> IterIntOps<Nodes> for Composite<Nodes> {
+// Iterate over the results of executing the trait's function on the input at
+// each nesting level starting from the outermost level.
+trait IterIntOps<NodeType: NextNode + IntOpAtLevel> {
+    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, NodeType>;
+}
+
+impl<Nodes: NextNode + IntOpAtLevel> IterIntOps<Nodes> for Composite<Nodes> {
     fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes> {
-        CompositeIterator::new(&self.head, input, self.head.nest_level())
+        CompositeIterator::new(&self.head, input)
     }
 }
 
@@ -42,11 +48,11 @@ struct CompositeIterator<'a, Nodes: NextNode + IntOpAtLevel> {
 }
 
 impl<'a, Nodes: NextNode + IntOpAtLevel> CompositeIterator<'a, Nodes> {
-    fn new(parent: &'a Nodes, input: usize, max_level: usize) -> Self {
+    fn new(parent: &'a Nodes, input: usize) -> Self {
         Self {
             parent,
             input,
-            level: max_level,
+            level: 0,
         }
     }
 }
@@ -54,11 +60,10 @@ impl<'a, Nodes: NextNode + IntOpAtLevel> CompositeIterator<'a, Nodes> {
 impl<'a, Nodes: NextNode + IntOpAtLevel> Iterator for CompositeIterator<'a, Nodes> {
     type Item = usize;
 
+    #[inline]
     fn next(&mut self) -> Option<Self::Item> {
         let result = self.parent.execute_at_level(self.input, self.level);
-        if self.level > 0 {
-            self.level -= 1
-        };
+        self.level += 1;
         result
     }
 }
@@ -68,6 +73,7 @@ struct Adder {
 }
 
 impl Adder {
+    #[inline]
     fn new(value: usize) -> Self {
         Self { value }
     }
@@ -195,8 +201,25 @@ fn bench_trait_objects(input: usize, ops: &Vec<Box<dyn IntOp>>) -> usize {
     ops.iter().map(|op| op.execute(input)).sum()
 }
 
+fn bench_baseline(input: usize) -> usize {
+    (input + 0)
+        + (input << 1)
+        + (input + 2)
+        + (input * 3)
+        + (input + 4)
+        + (input * 5)
+        + (input + 6)
+        + (input * 7)
+        + (input + 8)
+        + (input * 9)
+        + (input + 10)
+        + (input >> 11)
+        + (input + 12)
+        + (input >> 13)
+}
+
 pub fn criterion_benchmark(c: &mut Criterion) {
-    let mut group = c.benchmark_group("Adders");
+    let mut group = c.benchmark_group("Integer Ops");
 
     let ops_dyn: Vec<Box<dyn IntOp>> = vec![
         Box::new(Adder::new(0)),
@@ -266,17 +289,24 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         ConstRShifter::<13>::new()
     );
 
-    group.bench_function("static dispatch/arg", |b| {
+    group.bench_function("Static/Arg", |b| {
         b.iter(|| bench_composed(black_box(20), black_box(&ops)))
     });
-    group.bench_function("dynamic dispatch/arg", |b| {
+
+    group.bench_function("Vtable/Arg", |b| {
         b.iter(|| bench_trait_objects(black_box(20), black_box(&ops_dyn)))
     });
-    group.bench_function("static dispatch/const", |b| {
+
+    group.bench_function("Static/Const", |b| {
         b.iter(|| bench_composed(black_box(20), black_box(&ops_const)))
     });
-    group.bench_function("dynamic dispatch/const", |b| {
+
+    group.bench_function("Vtable/Const", |b| {
         b.iter(|| bench_trait_objects(black_box(20), black_box(&ops_dyn_const)))
+    });
+
+    group.bench_function("Baseline", |b| {
+        b.iter(|| bench_baseline(black_box(20)))
     });
 }
 
