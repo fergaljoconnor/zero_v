@@ -1,11 +1,18 @@
 [package]
 name = "zero_v"
 version = "0.1.0"
+description = """
+A library for implementing iterators over function outputs for collections of
+types implementing a common trait, without using vtables/ dynamic polymorphism.
+"""
+license = "MIT OR Apache-2.0"
 authors = ["fergal <fergaljamesoconnor@gmail.com>"]
 edition = "2018"
 exclude = [
     "blob/*",
 ]
+repository = "https://github.com/fergaljoconnor/zero_v"
+homepage = "https://github.com/fergaljoconnor/zero_v"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
