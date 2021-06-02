@@ -102,10 +102,10 @@ macro_rules! compose_nodes {
         ()
     };
     ($val: expr) => {
-       Node::base($val)
+       $crate::Node::base($val)
     };
     ($left: expr, $($right: expr), +) => {
-        Node::new($left, compose_nodes!( $($right), +))
+        $crate::Node::new($left, $crate::compose_nodes!( $($right), +))
     };
 }
 
@@ -115,7 +115,7 @@ macro_rules! compose_nodes {
 ///
 /// # Example usage
 /// ```
-/// use zero_v::{compose, compose_nodes, Composite, Node};
+/// use zero_v::{compose, Composite, Node};
 ///
 /// let nodes = compose!(1, 2);
 /// assert_eq!(nodes, Composite::new(Node::new(1, Node::base(2))));
@@ -123,7 +123,7 @@ macro_rules! compose_nodes {
 #[macro_export]
 macro_rules! compose {
     ($($right: expr), *) => {
-        Composite::new(compose_nodes!( $($right), *))
+        $crate::Composite::new($crate::compose_nodes!( $($right), *))
     };
 }
 
