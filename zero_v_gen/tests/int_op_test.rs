@@ -1,7 +1,7 @@
 use zero_v::compose;
-use zero_v_gen::zero_v_gen;
+use zero_v_gen::zero_v;
 
-#[zero_v_gen]
+#[zero_v(trait_types)]
 trait IntOp {
     fn execute_1(&self, input: usize) -> usize;
     fn execute_2(&self, input_1: usize, input_2: usize) -> usize;
@@ -83,6 +83,11 @@ impl IntOp for LShifter {
     }
 }
 
+#[zero_v(fn_generics, IntOp as IntOps)]
+fn execute_1(input: usize, ops: &IntOps) -> Vec<usize> {
+    ops.iter_execute_1(input).collect()
+}
+
 #[test]
 fn test_execute() {
     let ops = compose!(
@@ -101,4 +106,18 @@ fn test_execute() {
         results,
         vec![19, 9 << 10 << 1, 21, 9 * 10 * 3, 9 >> 10 >> 2]
     );
+}
+
+#[test]
+fn test_fn_generics() {
+    let ops = compose!(
+        Adder::new(0),
+        LShifter::new(1),
+        Adder::new(2),
+        Multiplier::new(3),
+        RShifter::new(2)
+    );
+
+    let results = execute_1(10, &ops);
+    assert_eq!(results, vec![10, 10 << 1, 10 + 2, 10 * 3, 10 >> 2]);
 }

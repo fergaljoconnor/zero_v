@@ -197,4 +197,4 @@ pub use composite::{Composite, NextNode, Node};
 extern crate zero_v_gen;
 
 #[cfg(feature = "gen")]
-pub use zero_v_gen::{composed, zero_v_gen};
+pub use zero_v_gen::zero_v;

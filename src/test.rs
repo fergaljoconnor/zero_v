@@ -1,7 +1,7 @@
 use crate as zero_v;
-use crate::{compose, zero_v_gen};
+use crate::{compose, zero_v};
 
-#[zero_v_gen]
+#[zero_v(trait_types)]
 trait IntOp {
     fn execute(&self, input: usize) -> usize;
 }

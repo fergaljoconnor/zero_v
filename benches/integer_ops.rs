@@ -1,7 +1,7 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use zero_v::{compose, composed, zero_v_gen};
+use zero_v::{compose, zero_v};
 
-#[zero_v_gen]
+#[zero_v(trait_types)]
 trait IntOp {
     fn execute(&self, input: usize) -> usize;
 }
@@ -127,7 +127,7 @@ impl<const VALUE: usize> IntOp for ConstLShifter<VALUE> {
     }
 }
 
-#[composed(IntOp as IntOps)]
+#[zero_v(fn_generics, IntOp as IntOps)]
 fn bench_composed(input: usize, ops: &IntOps) -> usize {
     ops.iter_execute(input).sum()
 }
