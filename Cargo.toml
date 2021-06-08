@@ -6,7 +6,7 @@ A library for implementing iterators over function outputs for collections of
 types implementing a common trait, without using vtables/ dynamic polymorphism.
 """
 license = "MIT OR Apache-2.0"
-authors = ["fergal <fergaljamesoconnor@gmail.com>"]
+authors = ["fergal <fergaljamesoconnor@gmail.com>", "marshall <mcu@hey.com>"]
 edition = "2018"
 exclude = [
     "blob/*",

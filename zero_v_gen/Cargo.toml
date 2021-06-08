@@ -3,8 +3,10 @@ name = "zero_v_gen"
 version = "0.1.0"
 description = "Implementation helper macros for zero_v"
 license = "MIT OR Apache-2.0"
-authors = ["marshall <mcu@hey.com>"]
+authors = ["fergal <fergaljamesoconnor@gmail.com>", "marshall <mcu@hey.com>"]
 edition = "2018"
+repository = "https://github.com/fergaljoconnor/zero_v"
+homepage = "https://github.com/fergaljoconnor/zero_v"
 
 [lib]
 proc-macro = true
