@@ -6,7 +6,7 @@ A library for implementing iterators over function outputs for collections of
 types implementing a common trait, without using vtables/ dynamic polymorphism.
 """
 license = "MIT OR Apache-2.0"
-authors = ["fergal <fergaljamesoconnor@gmail.com>"]
+authors = ["fergal <fergaljamesoconnor@gmail.com>", "marshall <mcu@hey.com>"]
 edition = "2018"
 exclude = [
     "blob/*",
@@ -17,9 +17,14 @@ homepage = "https://github.com/fergaljoconnor/zero_v"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+zero_v_gen = { path = "zero_v_gen", optional = true }
 
 [dev-dependencies]
 criterion = "0.3"
+
+[features]
+default = ["gen"]
+gen = ["zero_v_gen"]
 
 [[bench]]
 name = "integer_ops"

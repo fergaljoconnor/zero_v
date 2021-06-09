@@ -192,3 +192,9 @@ mod composite;
 mod test;
 
 pub use composite::{Composite, NextNode, Node};
+
+#[cfg(feature = "gen")]
+extern crate zero_v_gen;
+
+#[cfg(feature = "gen")]
+pub use zero_v_gen::zero_v;

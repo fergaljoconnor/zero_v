@@ -1,71 +1,9 @@
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
-use zero_v::{compose, compose_nodes, Composite, NextNode, Node};
+use zero_v::{compose, zero_v};
 
-// The trait we want members of our collection to implement
+#[zero_v(trait_types)]
 trait IntOp {
     fn execute(&self, input: usize) -> usize;
-}
-
-// Execute the trait's function on the object at a certain nesting level
-trait IntOpAtLevel {
-    fn execute_at_level(&self, input: usize, level: usize) -> Option<usize>;
-}
-
-impl IntOpAtLevel for () {
-    #[inline]
-    fn execute_at_level(&self, _input: usize, _level: usize) -> Option<usize> {
-        None
-    }
-}
-
-impl<A: IntOp, B: NextNode + IntOpAtLevel> IntOpAtLevel for Node<A, B> {
-    #[inline]
-    fn execute_at_level(&self, input: usize, level: usize) -> Option<usize> {
-        if level != 0 {
-            self.next.execute_at_level(input, level - 1)
-        } else {
-            Some(self.data.execute(input))
-        }
-    }
-}
-
-// Iterate over the results of executing the trait's function on the input at
-// each nesting level starting from the outermost level.
-trait IterIntOps<NodeType: NextNode + IntOpAtLevel> {
-    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, NodeType>;
-}
-
-impl<Nodes: NextNode + IntOpAtLevel> IterIntOps<Nodes> for Composite<Nodes> {
-    fn iter_execute(&self, input: usize) -> CompositeIterator<'_, Nodes> {
-        CompositeIterator::new(&self.head, input)
-    }
-}
-
-struct CompositeIterator<'a, Nodes: NextNode + IntOpAtLevel> {
-    level: usize,
-    input: usize,
-    parent: &'a Nodes,
-}
-
-impl<'a, Nodes: NextNode + IntOpAtLevel> CompositeIterator<'a, Nodes> {
-    fn new(parent: &'a Nodes, input: usize) -> Self {
-        Self {
-            parent,
-            input,
-            level: 0,
-        }
-    }
-}
-
-impl<'a, Nodes: NextNode + IntOpAtLevel> Iterator for CompositeIterator<'a, Nodes> {
-    type Item = usize;
-
-    #[inline]
-    fn next(&mut self) -> Option<Self::Item> {
-        let result = self.parent.execute_at_level(self.input, self.level);
-        self.level += 1;
-        result
-    }
 }
 
 struct Adder {
@@ -189,12 +127,9 @@ impl<const VALUE: usize> IntOp for ConstLShifter<VALUE> {
     }
 }
 
-fn bench_composed<NodeType, Composed>(input: usize, composed: &Composed) -> usize
-where
-    NodeType: IntOpAtLevel + NextNode,
-    Composed: IterIntOps<NodeType>,
-{
-    composed.iter_execute(input).sum()
+#[zero_v(fn_generics, IntOp as IntOps)]
+fn bench_composed(input: usize, ops: &IntOps) -> usize {
+    ops.iter_execute(input).sum()
 }
 
 fn bench_trait_objects(input: usize, ops: &Vec<Box<dyn IntOp>>) -> usize {
@@ -305,9 +240,7 @@ pub fn criterion_benchmark(c: &mut Criterion) {
         b.iter(|| bench_trait_objects(black_box(20), black_box(&ops_dyn_const)))
     });
 
-    group.bench_function("Baseline", |b| {
-        b.iter(|| bench_baseline(black_box(20)))
-    });
+    group.bench_function("Baseline", |b| b.iter(|| bench_baseline(black_box(20))));
 }
 
 criterion_group!(benches, criterion_benchmark);
