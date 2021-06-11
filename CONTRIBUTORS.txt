@@ -1,3 +1,4 @@
 # Contributors to the zero_v project
 
 * Fergal O'Connor <fergaljamesoconnor@gmail.com>
+* Marshall Culpepper <mcu@hey.com>
