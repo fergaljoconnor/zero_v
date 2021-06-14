@@ -2,7 +2,7 @@ use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
-use syn::{parse_macro_input, parse_quote, ItemFn, Token};
+use syn::{parse_macro_input, parse_quote, ItemFn, Token, WherePredicate};
 
 use crate::Idents;
 
@@ -21,12 +21,20 @@ impl FnGenerics {
         let level_trait = idents.level_trait();
         let iter_trait = idents.iter_trait();
 
+        let generics = f.sig.generics.clone();
+        let mut iter_generics = generics.clone();
+        iter_generics.params.push(parse_quote! { NodeType });
+
         f.sig.generics.params.push(parse_quote! { NodeType });
         f.sig.generics.params.push(parse_quote! { #type_name });
-        f.sig.generics.where_clause = Some(parse_quote! {
-            where NodeType: #level_trait + NextNode,
-                  #type_name: #iter_trait<NodeType>
-        });
+        f.sig
+            .generics
+            .make_where_clause()
+            .predicates
+            .extend::<Vec<WherePredicate>>(vec![
+                parse_quote! { NodeType: NextNode + #level_trait #generics },
+                parse_quote! { #type_name: #iter_trait #iter_generics },
+            ]);
 
         TokenStream::from(quote! { #f })
     }
