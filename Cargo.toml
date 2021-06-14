@@ -1,6 +1,6 @@
 [package]
 name = "zero_v"
-version = "0.1.0"
+version = "0.2.0"
 description = """
 A library for implementing iterators over function outputs for collections of
 types implementing a common trait, without using vtables/ dynamic polymorphism.
