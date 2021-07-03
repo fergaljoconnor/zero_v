@@ -126,7 +126,7 @@ trait IntOp {
 trait IntOpAtLevel {
     fn execute_at_level(&self, input: usize, level: usize) -> Option<usize>;
 }
-
+//
 // You'll need to implement this level execution trait for two types,
 // The first type is Node<A, B> where A implements your basic trait and B
 // implements the level execution trait. For this type, just
@@ -141,10 +141,19 @@ impl<A: IntOp, B: NextNode + IntOpAtLevel> IntOpAtLevel for Node<A, B> {
         }
     }
 }
+
 // The second type is the unit type. For this implementation, just return None.
 impl IntOpAtLevel for () {
     fn execute_at_level(&self, _input: usize, _level: usize) -> Option<usize> {
         None
+    }
+}
+
+// You'll only need this one if you want to be able to access the methods in
+// your collection by index in a way that doesn't fit in with the iterator API.
+impl <A: NextNode + IntOpAtLevel> IntOpAtLevel for Composite<A> {
+    fn execute_at_level(&self, input: usize, level: usize) -> Option<usize> {
+        self.head.execute_at_level(input, level)
     }
 }
 
@@ -239,7 +248,7 @@ mod composite;
 #[cfg(test)]
 mod test;
 
-pub use composite::{Composite, NextNode, Node};
+pub use composite::{Composite, HasLength, NextNode, Node};
 
 #[cfg(feature = "gen")]
 extern crate zero_v_gen;

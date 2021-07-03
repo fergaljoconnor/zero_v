@@ -73,7 +73,7 @@ impl TraitTypes {
             .collect();
 
         let level_trait = idents.level_trait();
-        let mut level_generics = trait_generics.clone();
+
         let zv_trait_type: GenericParam = parse_quote! { TraitType };
         let zv_trait_type_pred: WherePredicate =
             parse_quote! { TraitType: #trait_ident #ty_generics };
@@ -84,17 +84,30 @@ impl TraitTypes {
         let zv_generics = vec![zv_trait_type.clone(), zv_node_type.clone()];
         let zv_where = vec![zv_trait_type_pred.clone(), zv_node_type_pred.clone()];
 
+        let mut level_generics = trait_generics.clone();
         level_generics.params.extend(zv_generics);
         level_generics
             .make_where_clause()
             .predicates
             .extend(zv_where);
 
+
         let (level_impl_generics, _, level_where_clause) = level_generics.split_for_impl();
         let level_methods: Vec<Ident> = idents.level_methods().collect();
         let level_method_inputs = trait_methods()
             .map(|m| m.sig.inputs.clone())
             .collect::<Vec<_>>();
+
+        let composite_zv_generics = vec![zv_node_type.clone()];
+        let composite_zv_where = vec![zv_node_type_pred.clone()];
+
+        let mut composite_level_generics = trait_generics.clone();
+        composite_level_generics.params.extend(composite_zv_generics);
+        composite_level_generics
+            .make_where_clause()
+            .predicates
+            .extend(composite_zv_where);
+        let (composite_level_generics, _, composite_level_where) = composite_level_generics.split_for_impl();
 
         let level_method_outputs: Vec<Type> = trait_methods()
             .map(|m| match &m.sig.output {
@@ -196,6 +209,20 @@ impl TraitTypes {
                     }
                 )*
             }
+
+            impl #composite_level_generics #level_trait #ty_generics
+                for Composite<#zv_node_type>
+            #composite_level_where
+            {
+                #(
+                    fn #level_methods(#level_method_inputs, level: usize)
+                        -> #level_method_outputs
+                    {
+                            self.head.#level_methods(#trait_method_args, level)
+                    }
+                )*
+            }
+
 
             trait #iter_trait #iter_generics #iter_where_clause {
                 #(

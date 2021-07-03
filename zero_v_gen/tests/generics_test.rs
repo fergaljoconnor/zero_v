@@ -41,3 +41,14 @@ fn test_generic_trait() {
     let results: Vec<usize> = apply(&impls, &100);
     assert_eq!(results, vec![101, 101]);
 }
+
+#[test]
+fn test_generic_manual_iter() {
+    let impls = compose!(Plus(1), PlusLen("ab"));
+
+    let mapped: Vec<_> = (0..impls.len())
+        .filter_map(|index| impls.apply_at_level(&100, index))
+        .collect();
+
+    assert_eq!(vec![101, 102], mapped);
+}

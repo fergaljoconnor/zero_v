@@ -40,6 +40,10 @@ impl<A: NextNode> Composite<A> {
     pub fn new(head: A) -> Self {
         Self { head }
     }
+
+    pub fn len(&self) -> usize {
+        self.head.get_len()
+    }
 }
 
 /// Represents a collection of one or more objects.
@@ -82,9 +86,25 @@ impl<A> Node<A, ()> {
 // X or Y at compile time. In this case, we don't know this information while
 // writing this library, but the library user will know the exact type of
 // NextNode at compile time.
-pub trait NextNode {}
+pub trait NextNode: HasLength {}
 impl NextNode for () {}
 impl<A, B: NextNode> NextNode for Node<A, B> {}
+
+pub trait HasLength {
+    fn get_len(&self) -> usize;
+}
+
+impl HasLength for () {
+    fn get_len(&self) -> usize {
+        0
+    }
+}
+
+impl<A, B: NextNode> HasLength for Node<A, B> {
+    fn get_len(&self) -> usize {
+        self.next.get_len() + 1
+    }
+}
 
 /// Takes a list of objects and uses them to build a nested node object
 /// with one of the original objects contained in the data field of each node.

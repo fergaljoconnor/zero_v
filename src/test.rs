@@ -26,3 +26,13 @@ fn can_compose() {
     let outputs: Vec<usize> = composite.iter_execute(0).collect();
     assert_eq!(outputs, vec![11, 12, 13]);
 }
+
+
+#[test]
+fn can_iter_manually_by_level() {
+    let composite = compose!(Adder::<11>::new(), Adder::<12>::new(), Adder::<13>::new());
+    let mut outputs = Vec::new();
+    for i in 0..composite.len() {
+        outputs.push(composite.head.execute_at_level(0, i));
+    }
+}

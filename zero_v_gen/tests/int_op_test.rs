@@ -121,3 +121,15 @@ fn test_fn_generics() {
     let results = execute_1(10, &ops);
     assert_eq!(results, vec![10, 10 << 1, 10 + 2, 10 * 3, 10 >> 2]);
 }
+
+#[test]
+fn test_mixing_by_manual_iteration() {
+    let ops = compose!(Adder::new(1), Multiplier::new(2));
+    let (input_1, input_2) = (3, 4);
+    let mut outputs = Vec::new();
+    for i in 0..ops.len() {
+        let output = ops.execute_1_at_level(input_1, i).unwrap();
+        outputs.push(ops.execute_2_at_level(input_2, output, i).unwrap());
+    }
+    println!("{:?}", outputs);
+}
