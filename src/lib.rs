@@ -245,10 +245,12 @@ stress the following caveats.
 */
 
 mod composite;
+mod level;
 #[cfg(test)]
 mod test;
 
 pub use composite::{Composite, HasLength, NextNode, Node};
+pub use level::Level;
 
 #[cfg(feature = "gen")]
 extern crate zero_v_gen;

@@ -1,3 +1,5 @@
+use crate::level::Level;
+
 /*
 The current structure of the composite system is
 similar to a linked list but which each node containing a type instead
@@ -41,8 +43,14 @@ impl<A: NextNode> Composite<A> {
         Self { head }
     }
 
+    /// Get the length of the composite
     pub fn len(&self) -> usize {
         self.head.get_len()
+    }
+
+    /// Iterate over the level values of the composite
+    pub fn iter_levels(&self) -> impl Iterator<Item=Level<Self>> {
+        (0..self.len()).map(|value| Level::new(value))
     }
 }
 
@@ -149,7 +157,9 @@ macro_rules! compose {
 
 #[cfg(test)]
 mod test {
+    use crate::Level;
     use super::{Composite, Node};
+
     #[test]
     fn can_build_composites_with_compose_macro() {
         assert_eq!(compose!(), Composite::new(()));
@@ -159,5 +169,19 @@ mod test {
             compose!(0, 1, 2),
             Composite::new(Node::new(0, Node::new(1, Node::base(2))))
         );
+    }
+
+    #[test]
+    fn can_iterate_collection_levels() {
+        let test_case_empty = compose!();
+        let observed: Vec<_> = test_case_empty.iter_levels().collect();
+        let expected: Vec<_> = vec![];
+        assert_eq!(observed, expected);
+
+        let test_case_filled = compose!("a", 27, "b");
+        let observed: Vec<_> = test_case_filled.iter_levels().collect();
+        let expected: Vec<_> = vec![0, 1, 2].into_iter().map(|value| Level::new(value)).collect();
+        assert_eq!(observed, expected);
+
     }
 }
